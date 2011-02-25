@@ -1,7 +1,6 @@
 package com.brightcove.opensource
 {
 	import flash.display.Bitmap;
-	import flash.display.BlendMode;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.net.URLRequest;
@@ -19,7 +18,7 @@ package com.brightcove.opensource
 		private var _imageLoader:ImageLoad;
 		private var _tweet:Object;
 		
-		public function Tweet(tweet:Object, width:Number)
+		public function Tweet(tweet:TweetDTO, width:Number)
 		{	
 			Security.allowDomain("*");
 			Security.allowInsecureDomain("*");

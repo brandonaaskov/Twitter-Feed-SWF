@@ -16,6 +16,7 @@ package com.brightcove.opensource
 	
 	public class TwitterView extends Sprite
 	{
+		//icons
 		[Embed(source="../assets/twitter_logo.png")]
         private var TwitterIcon:Class;
         
@@ -34,11 +35,20 @@ package com.brightcove.opensource
         [Embed(source="../assets/tweet_right.png")]
         private var TweetRight:Class;
 
+
+		private var _experienceModule:ExperienceModule;
+		private var _videoPlayerModule:VideoPlayerModule;
+		private var _tweets:Array;
+		
+		//display related
 		private var _twitterContainer:Sprite = new Sprite();
 		private var _tweetArea:Sprite = new Sprite();
 		private var _tweetAreaWidth:Number;
 		private var _tweetsContainer:Sprite;
-		private var _tweets:Array;
+		private var _tweetLeft:Sprite = new Sprite();
+		private var _tweetRight:Sprite = new Sprite();
+				
+		//animation properties
 		private var _tweener:PropertyTween;
 		private var _tweening:Boolean = false;
 		private var _tweetsContainerMaxX:Number;
@@ -47,43 +57,57 @@ package com.brightcove.opensource
 		
 		public function TwitterView(experienceModule:ExperienceModule, videoPlayerModule:VideoPlayerModule, tweets:Array)
 		{
+			_experienceModule = experienceModule;
+			_videoPlayerModule = videoPlayerModule;
 			_tweets = tweets;	
 			
+			setupEventListeners();
+			
+			addDisplayItems();
+			addTweets();
+			
+			_animationTimer.addEventListener(TimerEvent.TIMER, onAnimationTimer);
+			_animationTimer.start();
+		}
+		
+		private function setupEventListeners():void
+		{
+			_tweetLeft.addEventListener(MouseEvent.CLICK, onLeftClicked);
+			_tweetRight.addEventListener(MouseEvent.CLICK, onRightClicked);
+		}
+		
+		private function addDisplayItems():void
+		{
 			var twitterIcon:Bitmap = new TwitterIcon();
 			_twitterContainer.addChild(twitterIcon);
 			
 			var tweetBGLeft:Bitmap = new TweetBGLeft();
 			var tweetBGRight:Bitmap = new TweetBGRight();
+			
 			var leftButton:Bitmap = new TweetLeft();
 			var rightButton:Bitmap = new TweetRight();
-			var tweetLeft:Sprite = new Sprite();
-			var tweetRight:Sprite = new Sprite();
-			tweetLeft.addChild(leftButton);
-			tweetRight.addChild(rightButton);
+			_tweetLeft.addChild(leftButton);
+			_tweetRight.addChild(rightButton);
+			_tweetLeft.buttonMode = true;
+			_tweetRight.buttonMode = true;
 			
-			tweetLeft.buttonMode = true;
-			tweetRight.buttonMode = true;
-			tweetLeft.addEventListener(MouseEvent.CLICK, onLeftClicked);
-			tweetRight.addEventListener(MouseEvent.CLICK, onRightClicked);
+			//i need to set this now before i populate the _tweetsContainer and the width becomes much wider
+			_tweetAreaWidth = _videoPlayerModule.getWidth() - twitterIcon.width - _tweetLeft.width - _tweetRight.width;
 			
-			tweetBGRight.x = tweetBGLeft.width;
-			tweetRight.x = videoPlayerModule.getWidth() - tweetRight.width;
-			tweetLeft.x = tweetRight.x - tweetLeft.width;
-			
-			var tweetAreaWidth:Number = videoPlayerModule.getWidth() - twitterIcon.width - tweetLeft.width - tweetRight.width;
 			var tweetBG:Bitmap = new TweetBG();
+			tweetBG.width = _tweetAreaWidth;
+			tweetBGRight.x = _tweetAreaWidth - tweetBGRight.width;
+			
 			_tweetArea.x = twitterIcon.width;
-			tweetBG.width = tweetAreaWidth;
+			_tweetRight.x = _videoPlayerModule.getWidth() - _tweetRight.width;
+			_tweetLeft.x = _tweetRight.x - _tweetLeft.width;
+
 			_tweetArea.addChild(tweetBG);
 			_tweetArea.addChild(tweetBGLeft);
-			tweetBGRight.x = _tweetArea.width - tweetBGRight.width;
 			_tweetArea.addChild(tweetBGRight);
-			_tweetAreaWidth = _tweetArea.width;
-			
-			_twitterContainer.addChild(tweetLeft);
-			_twitterContainer.addChild(tweetRight);
+			_twitterContainer.addChild(_tweetLeft);
+			_twitterContainer.addChild(_tweetRight);
 			_twitterContainer.addChild(_tweetArea);
-			
 			this.addChild(_twitterContainer);
 			
 			var topBorder:Sprite = new Sprite();
@@ -96,11 +120,6 @@ package com.brightcove.opensource
 			tweetMask.graphics.drawRect(_tweetArea.x, 0, _tweetArea.width, _tweetArea.height);
 			this.addChild(tweetMask);
 			_tweetArea.mask = tweetMask;
-			
-			addTweets();
-			
-			_animationTimer.addEventListener(TimerEvent.TIMER, onAnimationTimer);
-			_animationTimer.start();
 		}
 		
 		private function addTweets():void
@@ -109,17 +128,38 @@ package com.brightcove.opensource
 			
 			for(var i:uint = 0; i < _tweets.length; i++)
 			{
-				var entry:Object = _tweets[i];
-				var tweet:Tweet = new Tweet(entry, _tweetArea.width);
+				var tweetDTO:TweetDTO = _tweets[i];
+				var tweet:Tweet = new Tweet(tweetDTO, _tweetArea.width);
+				
 				tweet.x = _tweetArea.width * i;
 				_tweetsContainer.addChild(tweet);
 			}
 			
+			//set this for knowing when to stop allowing left button clicks
 			_tweetsContainerMaxX = -(TwitterSearch.NUMBER_OF_RESULTS * _tweetArea.width);
 			
 			_tweetArea.addChild(_tweetsContainer);
 		}
 		
+		private function animateTweets(newX:Number):void
+		{
+			_tweener = new PropertyTween(_tweetsContainer, "x", Bounce.easeInOut, newX, .3);
+			_tweener.addEventListener(TweenEvent.COMPLETE, onTweenComplete);
+			_tweening = true;
+			_tweener.start();
+			_animationTimer.stop(); //make sure we stop the animation timer for now
+		}
+		
+		private function startRestartCountdown():void
+		{
+			//wait 10 seconds - if the user doesn't click anything, this timer complete event fires and animation starts again
+			_restartAnimationTimer.stop();
+			_restartAnimationTimer = new Timer(10000, 1);
+			_restartAnimationTimer.addEventListener(TimerEvent.TIMER_COMPLETE, onRestartAnimationTimerComplete);
+			_restartAnimationTimer.start();
+		}
+		
+		//------------------------------------------------------------------------------ EVENT HANDLERS
 		private function onLeftClicked(pEvent:MouseEvent):void
 		{	
 			if(!_tweening)
@@ -173,23 +213,6 @@ package com.brightcove.opensource
 					addTweets();
 				}
 			}
-		}
-		
-		private function animateTweets(newX:Number):void
-		{
-			_tweener = new PropertyTween(_tweetsContainer, "x", Bounce.easeInOut, newX, .3);
-			_tweener.addEventListener(TweenEvent.COMPLETE, onTweenComplete);
-			_tweening = true;
-			_tweener.start();
-			_animationTimer.stop();
-		}
-		
-		private function startRestartCountdown():void
-		{
-			_restartAnimationTimer.stop();
-			_restartAnimationTimer = new Timer(10000, 1);
-			_restartAnimationTimer.addEventListener(TimerEvent.TIMER_COMPLETE, onRestartAnimationTimerComplete);
-			_restartAnimationTimer.start();
 		}
 		
 		private function onRestartAnimationTimerComplete(pEvent:TimerEvent):void

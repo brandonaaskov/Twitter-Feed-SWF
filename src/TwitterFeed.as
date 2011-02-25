@@ -13,11 +13,13 @@ package {
 	{
 		private var _experienceModule:ExperienceModule;
 		private var _videoPlayerModule:VideoPlayerModule;
+		
 		private var _twitterSearch:TwitterSearch = new TwitterSearch();
 		private var _twitterView:TwitterView;
 		
 		public function TwitterFeed()
 		{
+			trace("@author Brandon Aaskov");
 		}
 		
 		override protected function initialize():void
@@ -25,11 +27,17 @@ package {
 			_experienceModule = player.getModule(APIModules.EXPERIENCE) as ExperienceModule;
 			_videoPlayerModule = player.getModule(APIModules.VIDEO_PLAYER) as VideoPlayerModule;
 			
-			_twitterSearch.addEventListener(TwitterEvent.RESULTS_LOADED, onTwitterResultsLoaded);
-			var searchTerm:String = getParamValue("twitterTerm");
-			_twitterSearch.getFeedItems(searchTerm);
+			setupEventListeners();
+			
+			_twitterSearch.getFeedItems(getParamValue("twitterTerm"));
 		}
 		
+		private function setupEventListeners():void
+		{
+			_twitterSearch.addEventListener(TwitterEvent.RESULTS_LOADED, onTwitterResultsLoaded);
+		}
+		
+		//------------------------------------------------------------------------------ EVENT HANDLERS
 		private function onTwitterResultsLoaded(pEvent:TwitterEvent):void
 		{
 			var tweets:Array = _twitterSearch.tweets;
@@ -38,6 +46,7 @@ package {
 			this.addChild(_twitterView);
 		}
 		
+		//------------------------------------------------------------------------------ HELPERS
 		private function getParamValue(key:String):String
 		{
 			//1: check url params for the value

@@ -14,6 +14,7 @@ package com.brightcove.opensource
 	public class TwitterSearch extends EventDispatcher
 	{
 		public static const NUMBER_OF_RESULTS:uint = 30;
+		
 		private var _baseSearchURL:String = "http://search.twitter.com/search.json";
 		private var _twitterResults:Object;
 		private var _tweets:Array = new Array();
@@ -45,17 +46,7 @@ package com.brightcove.opensource
 			var results:Object = _twitterResults.results;
 			for(var item:* in results)
 			{
-				var entry:Object = results[item];
-				
-				var tweet:Object = {
-					id: entry.id_str,
-					username: entry.from_user,
-					thumbnail: entry.profile_image_url,
-					text: entry.text,
-					url: "http://twitter.com/#!/" + entry.from_user + "/status/" + entry.id_str
-				};
-				
-				_tweets.push(tweet);
+				_tweets.push(new TweetDTO(results[item]));
 			}
 			
 			dispatchEvent(new TwitterEvent(TwitterEvent.RESULTS_LOADED));
