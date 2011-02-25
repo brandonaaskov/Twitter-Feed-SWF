@@ -28,7 +28,7 @@ package com.brightcove.opensource
 			var params:URLVariables = new URLVariables();
 			params.rpp = TwitterSearch.NUMBER_OF_RESULTS;
 			params.lang = "en";
-			params.q = escape(searchTerm);
+			params.q = searchTerm;
 			params.t = new Date().time;
 			
 			var request:URLRequest = new URLRequest(_baseSearchURL);
