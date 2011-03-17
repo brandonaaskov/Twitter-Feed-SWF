@@ -5,6 +5,7 @@ package com.brightcove.opensource
 	
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import flash.events.IOErrorEvent;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.net.URLVariables;
@@ -13,7 +14,7 @@ package com.brightcove.opensource
 	
 	public class TwitterSearch extends EventDispatcher
 	{
-		public static const NUMBER_OF_RESULTS:uint = 30;
+		public static const NUMBER_OF_RESULTS:uint = 20;
 		
 		private var _baseSearchURL:String = "http://search.twitter.com/search.json";
 		private var _twitterResults:Object;
@@ -36,11 +37,13 @@ package com.brightcove.opensource
 			
 			var loader:URLLoader = new URLLoader();
 			loader.addEventListener(Event.COMPLETE, onSearchResultsLoaded);
+			loader.addEventListener(IOErrorEvent.IO_ERROR, onSearchIOError);
 			loader.load(request);
 		}
 		
 		private function onSearchResultsLoaded(pEvent:Event):void
 		{
+			trace("SEARCH RESULTS LOADED");
 			_twitterResults = JSON.decode(pEvent.target.data);
 			
 			var results:Object = _twitterResults.results;
@@ -49,7 +52,14 @@ package com.brightcove.opensource
 				_tweets.push(new TweetDTO(results[item]));
 			}
 			
+			_tweets.reverse(); //show oldest tweets first
+			
 			dispatchEvent(new TwitterEvent(TwitterEvent.RESULTS_LOADED));
+		}
+		
+		private function onSearchIOError(pEvent:IOErrorEvent):void
+		{
+			throw new Error("It's likely that too many calls were made to Twitter's API, and you are now in a 'blocked' state. Please wait a while.");
 		}
 		
 		public function get tweets():Array

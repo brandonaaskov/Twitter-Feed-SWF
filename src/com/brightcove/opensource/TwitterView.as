@@ -2,6 +2,7 @@ package com.brightcove.opensource
 {
 	import com.brightcove.api.modules.ExperienceModule;
 	import com.brightcove.api.modules.VideoPlayerModule;
+	import com.brightcove.opensource.events.TwitterEvent;
 	
 	import fl.motion.easing.*;
 	
@@ -68,6 +69,15 @@ package com.brightcove.opensource
 			
 			_animationTimer.addEventListener(TimerEvent.TIMER, onAnimationTimer);
 			_animationTimer.start();
+		}
+		
+		public function terminate():void
+		{
+			_tweetLeft.removeEventListener(MouseEvent.CLICK, onLeftClicked);
+			_tweetRight.removeEventListener(MouseEvent.CLICK, onRightClicked);
+			_animationTimer.removeEventListener(TimerEvent.TIMER, onAnimationTimer);
+			_tweener.removeEventListener(TweenEvent.COMPLETE, onTweenComplete);
+			_restartAnimationTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, onRestartAnimationTimerComplete);
 		}
 		
 		private function setupEventListeners():void
@@ -209,8 +219,9 @@ package com.brightcove.opensource
 				else
 				{
 					//replacing the tweet container (easier than making it carousel)
-					_tweetArea.removeChild(_tweetsContainer);
-					addTweets();
+//					_tweetArea.removeChild(_tweetsContainer);
+//					addTweets();
+					dispatchEvent(new TwitterEvent(TwitterEvent.TWEET_CYCLE_COMPLETE));
 				}
 			}
 		}

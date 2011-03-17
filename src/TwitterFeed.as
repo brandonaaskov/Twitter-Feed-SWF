@@ -16,6 +16,8 @@ package {
 		
 		private var _twitterSearch:TwitterSearch = new TwitterSearch();
 		private var _twitterView:TwitterView;
+		private var _twitterTerm:String;
+		private var _twitterViewOnStage:Boolean = false;
 		
 		public function TwitterFeed()
 		{
@@ -29,7 +31,8 @@ package {
 			
 			setupEventListeners();
 			
-			_twitterSearch.getFeedItems(getParamValue("twitterTerm"));
+			_twitterTerm = getParamValue("twitterTerm");
+			_twitterSearch.getFeedItems(_twitterTerm);
 		}
 		
 		private function setupEventListeners():void
@@ -40,10 +43,27 @@ package {
 		//------------------------------------------------------------------------------ EVENT HANDLERS
 		private function onTwitterResultsLoaded(pEvent:TwitterEvent):void
 		{
+			if(_twitterViewOnStage)
+			{
+				trace("REMOVING TWITTER VIEW");
+				removeChild(_twitterView);
+				_twitterView.terminate();
+				_twitterView = null;
+			}
+			
 			var tweets:Array = _twitterSearch.tweets;
 			
 			_twitterView = new TwitterView(_experienceModule, _videoPlayerModule, tweets);
+			_twitterView.addEventListener(TwitterEvent.TWEET_CYCLE_COMPLETE, onTweetCycleComplete);
+			
 			this.addChild(_twitterView);
+			_twitterViewOnStage = true;
+		}
+		
+		private function onTweetCycleComplete(pEvent:TwitterEvent):void
+		{
+			trace("CYCLE COMPLETE");
+			_twitterSearch.getFeedItems(_twitterTerm);
 		}
 		
 		//------------------------------------------------------------------------------ HELPERS
