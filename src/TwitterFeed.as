@@ -45,7 +45,6 @@ package {
 		{
 			if(_twitterViewOnStage)
 			{
-				trace("REMOVING TWITTER VIEW");
 				removeChild(_twitterView);
 				_twitterView.terminate();
 				_twitterView = null;
@@ -62,7 +61,6 @@ package {
 		
 		private function onTweetCycleComplete(pEvent:TwitterEvent):void
 		{
-			trace("CYCLE COMPLETE");
 			_twitterSearch.getFeedItems(_twitterTerm);
 		}
 		

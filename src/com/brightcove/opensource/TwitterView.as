@@ -219,8 +219,6 @@ package com.brightcove.opensource
 				else
 				{
 					//replacing the tweet container (easier than making it carousel)
-//					_tweetArea.removeChild(_tweetsContainer);
-//					addTweets();
 					dispatchEvent(new TwitterEvent(TwitterEvent.TWEET_CYCLE_COMPLETE));
 				}
 			}

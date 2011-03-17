@@ -43,7 +43,6 @@ package com.brightcove.opensource
 		
 		private function onSearchResultsLoaded(pEvent:Event):void
 		{
-			trace("SEARCH RESULTS LOADED");
 			_twitterResults = JSON.decode(pEvent.target.data);
 			
 			var results:Object = _twitterResults.results;
