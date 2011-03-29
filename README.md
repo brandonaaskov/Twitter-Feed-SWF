@@ -1,7 +1,7 @@
 About
 =====
 
-This project provides a SWF to be used as a SWFLoader in your BEML template that displays tweets based off of a search term or hashtag passed in through the player's publishing code. You can see an example here: [Twitter Feed Example](http://x.brightcove.com/brandon/Twitter-Feed/)
+This project provides a SWF to be used as a SWFLoader in your BEML template that displays tweets based off of a search term or hashtag passed in through the player's publishing code. You can see an example here: [Twitter Feed Example](http://opensource.brightcove.com/example/twitter-feed.html/)
 
 
 Setup
@@ -19,7 +19,7 @@ Setup
 	
 	*	You can add `<param name='twitterTerm' value='revision3' />` to the player's JavaScript publishing code on the page. This will override any value set on the SWFLoader's URL. This is most likely the option you'll be using.
 	
-	*	You can pass in the twitterTerm to the URL of the page. Using the same example as above, for instance, you could pass in `?twitterTerm=scamschool`, [like so](http://x.brightcove.com/brandon/Twitter-Feed/?twitterTerm=scamschool). This will override the publishing code parameter and the SWFLoader parameter, if either are set. This is a good option for testing out your plugin.
+	*	You can pass in the twitterTerm to the URL of the page. Using the same example as above, for instance, you could pass in `?twitterTerm=scamschool`, [like so](http://opensource.brightcove.com/example/twitter-feed.html/?twitterTerm=scamschool). This will override the publishing code parameter and the SWFLoader parameter, if either are set. This is a good option for testing out your plugin.
 
 
 Under the Hood
