@@ -6,7 +6,7 @@ This project provides a SWF to be used as a SWFLoader in your BEML template that
 
 Setup
 =====
-1.	Download the latest `TwitterFeed.swf` file from the Downloads section of the [GitHub project](https://github.com/BrightcoveOS/Twitter-Feed-SWF) and upload it to your web server. Make note of the URL for the next step.
+1.	Download the latest `TwitterFeed.swf` file from the project's bin-release folder and upload it to your web server. Make note of the URL for the next step.
 
 2.	Add the TwitterFeed.swf as a SWFLoader BEML element to your player. The BEML element will look like this:
 `<SWFLoader height="36" id="twitterFeed" source="http://mydomain.com/TwitterFeed.swf" />`
